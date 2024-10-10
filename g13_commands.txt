@@ -1,3 +1,3 @@
-ejecutar: john --max-run-time=1800 --min-length=4 --max-length=6 --format='dynamic=md5($p)' --encoding=Latin1  g13_foromotos.txt 
+ejecutar: john --wordlist=rae_words.txt --rules=jumbo --min-length=4 --format='dynamic=md5($p)' g13_foromotos.txt
 leer: john --show --format='dynamic=md5($p)'  g13_foromotos.txt > hashes.txt
 
