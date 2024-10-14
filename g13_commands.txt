@@ -1,3 +1,5 @@
-ejecutar: john --wordlist=rae_words.txt --rules=jumbo --min-length=4 --format='dynamic=md5($p)' g13_foromotos.txt
+ejecutar: john --wordlist=rae_words.txt --rules=jumbo --min-length=4 --fork=8  --format=Raw-MD5 g13_foromotos.txt
+john --wordlist=nombres.txt --rules=jumbo --min-length=4 --fork=8  --format=Raw-MD5 g13_foromotos.txt
+john --max-run-time=660 --min-length=4 --fork=8 --format=Raw-MD5 g13_foromotos.txt
 leer: john --show --format='dynamic=md5($p)'  g13_foromotos.txt > hashes.txt
 
