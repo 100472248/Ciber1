@@ -2,7 +2,7 @@ import subprocess
 import os
 
 # Define la ruta a John the Ripper y a los archivos de hashes
-john_path = "/opt/homebrew/bin/john"  # Asegúrate de que esta ruta sea correcta
+john_path = "/snap/john-the-ripper/639/run/john"  # Asegúrate de que esta ruta sea correcta
 hash_file_meneate = "g13_meneate.txt"
 hashes_file = "breaker.txt"  # Archivo con las contraseñas rotas de ForoMotos
 comando_break = f"john --wordlist={hashes_file} --format=Raw-MD5 {hash_file_meneate}"
