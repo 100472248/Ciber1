@@ -1,4 +1,5 @@
 import bcrypt
+import multiprocessing as mp
 
 # Ruta a los archivos
 hash_file_meneate = "/Users/pablo/Desktop/Ciber1/g13_meneate.txt"
@@ -14,7 +15,6 @@ def load_hashes(file_path):
     hashes = []
     with open(file_path, 'r') as file:
         for line in file:
-            # Separar el usuario del hash
             user, hash_bcrypt = line.strip().split(':')
             hashes.append((user, hash_bcrypt))
     return hashes
@@ -24,15 +24,25 @@ def load_passwords(file_path):
     with open(file_path, 'r') as file:
         return [line.strip() for line in file]
 
-# Intentar romper las contraseñas
-def crack_passwords(hashes, passwords):
+# Función que intentará romper un solo hash usando varias contraseñas
+def crack_single_hash(args):
+    user, hash_bcrypt, passwords = args
+    for password in passwords:
+        if check_password(hash_bcrypt, password):
+            return (user, password)
+    return None
+
+# Usar multiprocessing para romper las contraseñas en paralelo
+def crack_passwords_parallel(hashes, passwords):
     cracked_passwords = []
-    for user, hash_bcrypt in hashes:
-        for password in passwords:
-            if check_password(hash_bcrypt, password):
-                print(f"¡Contraseña rota! Usuario: {user}, Contraseña: {password}")
-                cracked_passwords.append((user, password))
-                break  # Salir del bucle si la contraseña ha sido encontrada
+    with mp.Pool(mp.cpu_count()) as pool:
+        # Preparar los argumentos para pasar a cada proceso
+        args = [(user, hash_bcrypt, passwords) for user, hash_bcrypt in hashes]
+        results = pool.map(crack_single_hash, args)
+
+        # Filtrar los resultados no nulos
+        cracked_passwords = [result for result in results if result]
+    
     return cracked_passwords
 
 # Guardar las contraseñas rotas en un archivo
@@ -46,8 +56,8 @@ if __name__ == "__main__":
     hashes = load_hashes(hash_file_meneate)
     passwords = load_passwords(passwords_file)
     
-    # Romper las contraseñas
-    cracked_passwords = crack_passwords(hashes, passwords)
+    # Romper las contraseñas en paralelo
+    cracked_passwords = crack_passwords_parallel(hashes, passwords)
     
     # Guardar las contraseñas rotas
     save_cracked_passwords(cracked_passwords, output_file)
