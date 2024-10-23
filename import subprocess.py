@@ -60,7 +60,6 @@ if __name__ == "__main__":
     
     # Romper las contraseñas
     print("Hola\n")
-    cracked_passwords = crack_passwords(hashes, passwords)
     # Romper las contraseñas en paralelo
     cracked_passwords = crack_passwords_parallel(hashes, passwords)
     
