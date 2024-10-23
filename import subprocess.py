@@ -2,13 +2,15 @@ import bcrypt
 import multiprocessing as mp
 
 # Ruta a los archivos
-hash_file_meneate = "/Users/pablo/Desktop/Ciber1/g13_meneate.txt"
-passwords_file = "/Users/pablo/Desktop/Ciber1/breaker.txt"
-output_file = "/Users/pablo/Desktop/Ciber1/contraseñas_rotas.txt"
+hash_file_meneate = "./g13_meneate.txt"
+passwords_file = "./breaker.txt"
+output_file = "./contraseñas_rotas.txt"
 
 # Función para verificar si una contraseña coincide con el hash bcrypt
 def check_password(hash_bcrypt, password):
-    return bcrypt.checkpw(password.encode('utf-8'), hash_bcrypt.encode('utf-8'))
+    print(hash_bcrypt, ",", password)
+    result = bcrypt.checkpw(password.encode('utf-8'), hash_bcrypt.encode('utf-8'))
+    return result
 
 # Cargar los hashes de g13_meneate.txt
 def load_hashes(file_path):
@@ -56,6 +58,9 @@ if __name__ == "__main__":
     hashes = load_hashes(hash_file_meneate)
     passwords = load_passwords(passwords_file)
     
+    # Romper las contraseñas
+    print("Hola\n")
+    cracked_passwords = crack_passwords(hashes, passwords)
     # Romper las contraseñas en paralelo
     cracked_passwords = crack_passwords_parallel(hashes, passwords)
     

@@ -1,11 +1,12 @@
 import subprocess
 import os
+import bcrypt
 
 # Define la ruta a John the Ripper y a los archivos de hashes
 john_path = "/snap/john-the-ripper/639/run/john"  # Asegúrate de que esta ruta sea correcta
 hash_file_meneate = "g13_meneate.txt"
 hashes_file = "breaker.txt"  # Archivo con las contraseñas rotas de ForoMotos
-comando_break = f"john --wordlist={hashes_file} --format=Raw-MD5 {hash_file_meneate}"
+comando_break = f"john --wordlist={hashes_file} --rules=all --format=Raw-MD5 {hash_file_meneate}"
 comando_read = f"john --show --format=Raw-MD5 {hash_file_meneate}"
 
 # Opción para ejecutar John the Ripper usando las contraseñas rotas
