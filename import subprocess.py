@@ -1,22 +1,18 @@
 import bcrypt
 import multiprocessing as mp
-import hashlib
 
 # Ruta a los archivos
 hash_file_meneate = "./g13_meneate.txt"
-passwords_file = "./breaker.txt"
+passwords_file = "./hashes.txt"
 output_file = "./contraseñas_rotas.txt"
 
-# Función para obtener el SHA-256 de una contraseña
-def sha256_hash(password):
-    return hashlib.sha256(password.encode('utf-8')).hexdigest()
-
 # Función para verificar si una contraseña coincide con el hash bcrypt
-def check_password(hash_bcrypt, password):
-    prehash = sha256_hash(password)
-    print("Prehash:", prehash, "\nHash:", hash_bcrypt)
-    if prehash[:16] == hash_bcrypt[:16]:
-        return bcrypt.checkpw(password.encode('utf-8'), hash_bcrypt.encode('utf-8'))
+def check_password(hashes, actual_password):
+    password = actual_password[1]
+    for hash_bcrypt in hashes:
+        print(hash_bcrypt[0], actual_password[0])
+        if hash_bcrypt[0] == passwords[0]:
+            return bcrypt.checkpw(password.encode('utf-8'), hash_bcrypt[1].encode('utf-8'))
     return False
 
 # Cargar los hashes de g13_meneate.txt
@@ -24,35 +20,34 @@ def load_hashes(file_path):
     hashes = []
     with open(file_path, 'r') as file:
         for line in file:
-            user, hash_bcrypt = line.strip().split(':')
-            hashes.append((user, hash_bcrypt))
+            user1, hash_bcrypt = line.strip().split(':')
+            hashes.append([user1, hash_bcrypt])
     return hashes
 
 # Cargar las contraseñas de breaker.txt
 def load_passwords(file_path):
+    passwords = []
     with open(file_path, 'r') as file:
-        return [line.strip() for line in file]
+        for line in file:
+            user2, password = line.strip().split(':')
+            passwords.append([user2, password])
+    return passwords
 
 # Función que intentará romper un solo hash usando varias contraseñas
-def crack_single_hash(args):
-    user, hash_bcrypt, passwords = args
-    for password in passwords:
-        if check_password(hash_bcrypt, password):
-            print(f"Contraseña correcta para {user}: {password}")
-            return (user, password)
+def crack_single_hash(hashes, passwords):
+    for i in range(len(passwords)):
+        actual_check= passwords[i]
+        if check_password(hashes, actual_check):
+            print(f"Contraseña correcta para {actual_check[0]}: {actual_check[1]}")
+            return actual_check
     return None
 
-# Usar multiprocessing para romper las contraseñas en paralelo
 def crack_passwords_parallel(hashes, passwords):
     cracked_passwords = []
     num_cores = mp.cpu_count()  # Obtener el número de núcleos
-    chunk_size = len(passwords) // num_cores  # Dividir contraseñas en chunks
-    password_chunks = [passwords[i:i + chunk_size] for i in range(0, len(passwords), chunk_size)]
-    
     with mp.Pool(num_cores) as pool:
-        # Preparar los argumentos para pasar a cada proceso
-        args = [(user, hash_bcrypt, password_chunks[i % num_cores]) for i, (user, hash_bcrypt) in enumerate(hashes)]
-        results = pool.map(crack_single_hash, args)
+        # Preparar los argumentos como una lista de tuplas (hashes y passwords)
+        results = pool.starmap(crack_single_hash, [(hashes, password) for password in passwords])
 
         # Filtrar los resultados no nulos
         cracked_passwords = [result for result in results if result]
