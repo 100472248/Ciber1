@@ -10,8 +10,8 @@ output_file = "./contraseñas_rotas.txt"
 def check_password(hashes, actual_password):
     password = actual_password[1]
     for hash_bcrypt in hashes:
-        print(hash_bcrypt[0], actual_password[0])
-        if hash_bcrypt[0] == passwords[0]:
+        if hash_bcrypt[0] == actual_password[0]:
+            print(hash_bcrypt[1], ",",  password)
             return bcrypt.checkpw(password.encode('utf-8'), hash_bcrypt[1].encode('utf-8'))
     return False
 
@@ -35,11 +35,9 @@ def load_passwords(file_path):
 
 # Función que intentará romper un solo hash usando varias contraseñas
 def crack_single_hash(hashes, passwords):
-    for i in range(len(passwords)):
-        actual_check= passwords[i]
-        if check_password(hashes, actual_check):
-            print(f"Contraseña correcta para {actual_check[0]}: {actual_check[1]}")
-            return actual_check
+    if check_password(hashes, passwords):
+        print(f"Contraseña correcta para {passwords[0]}: {passwords[1]}")
+        return passwords
     return None
 
 def crack_passwords_parallel(hashes, passwords):
