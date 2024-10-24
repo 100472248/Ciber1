@@ -1,16 +1,23 @@
 import bcrypt
 import multiprocessing as mp
+import hashlib
 
 # Ruta a los archivos
 hash_file_meneate = "./g13_meneate.txt"
 passwords_file = "./breaker.txt"
 output_file = "./contraseñas_rotas.txt"
 
+# Función para obtener el SHA-256 de una contraseña
+def sha256_hash(password):
+    return hashlib.sha256(password.encode('utf-8')).hexdigest()
+
 # Función para verificar si una contraseña coincide con el hash bcrypt
 def check_password(hash_bcrypt, password):
-    print(hash_bcrypt, ",", password)
-    result = bcrypt.checkpw(password.encode('utf-8'), hash_bcrypt.encode('utf-8'))
-    return result
+    prehash = sha256_hash(password)
+    print("Prehash:", prehash, "\nHash:", hash_bcrypt)
+    if prehash[:16] == hash_bcrypt[:16]:
+        return bcrypt.checkpw(password.encode('utf-8'), hash_bcrypt.encode('utf-8'))
+    return False
 
 # Cargar los hashes de g13_meneate.txt
 def load_hashes(file_path):
@@ -31,15 +38,20 @@ def crack_single_hash(args):
     user, hash_bcrypt, passwords = args
     for password in passwords:
         if check_password(hash_bcrypt, password):
+            print(f"Contraseña correcta para {user}: {password}")
             return (user, password)
     return None
 
 # Usar multiprocessing para romper las contraseñas en paralelo
 def crack_passwords_parallel(hashes, passwords):
     cracked_passwords = []
-    with mp.Pool(mp.cpu_count()) as pool:
+    num_cores = mp.cpu_count()  # Obtener el número de núcleos
+    chunk_size = len(passwords) // num_cores  # Dividir contraseñas en chunks
+    password_chunks = [passwords[i:i + chunk_size] for i in range(0, len(passwords), chunk_size)]
+    
+    with mp.Pool(num_cores) as pool:
         # Preparar los argumentos para pasar a cada proceso
-        args = [(user, hash_bcrypt, passwords) for user, hash_bcrypt in hashes]
+        args = [(user, hash_bcrypt, password_chunks[i % num_cores]) for i, (user, hash_bcrypt) in enumerate(hashes)]
         results = pool.map(crack_single_hash, args)
 
         # Filtrar los resultados no nulos
@@ -58,8 +70,6 @@ if __name__ == "__main__":
     hashes = load_hashes(hash_file_meneate)
     passwords = load_passwords(passwords_file)
     
-    # Romper las contraseñas
-    print("Hola\n")
     # Romper las contraseñas en paralelo
     cracked_passwords = crack_passwords_parallel(hashes, passwords)
     
@@ -67,3 +77,4 @@ if __name__ == "__main__":
     save_cracked_passwords(cracked_passwords, output_file)
     
     print(f"Proceso completado. Las contraseñas rotas se han guardado en {output_file}.")
+
