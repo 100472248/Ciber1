@@ -11,7 +11,6 @@ def check_password(hashes, actual_password):
     password = actual_password[1]
     for hash_bcrypt in hashes:
         if hash_bcrypt[0] == actual_password[0]:
-            print(hash_bcrypt[1], ",",  password)
             return bcrypt.checkpw(password.encode('utf-8'), hash_bcrypt[1].encode('utf-8'))
     return False
 

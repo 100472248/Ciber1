@@ -1,6 +1,7 @@
-ejecutar: john --wordlist=rae_words.txt --rules=jumbo  --min-length=4 --fork=16  --format=Raw-MD5   g13_foromotos.txt
-john --wordlist=contraseñas.txt --rules=jumbo  --min-length=4 --fork=16  --format=Raw-MD5 g13_foromotos.txt
-john --max-run-time=900  --internal-codepage=ANSI --format=Raw-MD5 --mask='?1?1?1?1?1?1' --fork=16 -1='[ -~1234567890aeiou]' g13_foromotos.txt 
-john --max-run-time=120 --min-length=4 --internal-codepage=ANSI --fork=16 --format=Raw-MD5 --incremental=ascii  g13_foromotos.txt
-leer: john --show --format='dynamic=md5($p)'  g13_foromotos.txt > hashes.txt
+(20s)john --wordlist=rae_words.txt --rules=jumbo  --min-length=4 --fork=8  --format=Raw-MD5   g13_foromotos.txt
+(60s)john --wordlist=contraseñas.txt --rules=jumbo  --min-length=4 --fork=8  --format=Raw-MD5 g13_foromotos.txt
+(45s)john  --format=Raw-MD5 --min-length=4 --max-length=5 --fork=8 g13_foromotos.txt
+(1200s)john --max-run-time=1200  --format=Raw-MD5 --mask='?1?1?1?1?1?1' --fork=8 -1='[ -~1234567890aeiou]' g13_foromotos.txt 
+(180s)john --max-run-time=180 --min-length=6 --fork=8 --format=Raw-MD5 --incremental=ascii  g13_foromotos.txt
+(135s)/bin/python3 "import subprocess.py"
 
