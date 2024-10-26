@@ -1,6 +1,6 @@
 (90s)john --wordlist=rae_words.txt --rules=dive  --min-length=4 --fork=8  --format=Raw-MD5   g13_foromotos.txt
 (60s)john --wordlist=contraseñas.txt --rules=jumbo  --min-length=4 --fork=8  --format=Raw-MD5 g13_foromotos.txt
-(45s)john  --format=Raw-MD5 --min-length=4 --max-length=5 --fork=8 g13_foromotos.txt
+(60s)john  --format=Raw-MD5 --min-length=4 --max-length=5 --fork=8 g13_foromotos.txt
 (1200s)john --max-run-time=1200  --format=Raw-MD5 --mask='?1?1?1?1?1?1' --fork=8 -1='[ -~1234567890aeiou]' g13_foromotos.txt 
-(135s)/bin/python3 "import subprocess.py"
+(150s)/bin/python3 "import subprocess.py"
 
